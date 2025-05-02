@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 let latestQR = '';
 const commands = new Map();
+const COMMAND_PREFIX = '.'; // Prefix for all commands
 
 // Ongeza amri moja kwa moja hapa
 commands.set('hello', {
@@ -157,9 +158,9 @@ async function startBot() {
         if (!text) return;
 
         // Commands
-        if (text.startsWith('.')) {
+        if (text.startsWith(COMMAND_PREFIX)) {
             const args = text.trim().split(/ +/);
-            const commandName = args.shift().slice(1).toLowerCase();
+            const commandName = args.shift().slice(COMMAND_PREFIX.length).toLowerCase();
 
             const command = commands.get(commandName);
             if (command) {
