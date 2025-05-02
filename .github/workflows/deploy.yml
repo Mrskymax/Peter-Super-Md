@@ -1,0 +1,29 @@
+name: Deploy Bot to Render
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Deploy to Render (custom script)
+        run: echo "Unaweza kuweka Render deploy hook hapa au run tests"
+
+      # Optional: Run tests
+      # - name: Run Tests
+      #   run: npm test
