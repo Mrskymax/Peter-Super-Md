@@ -41,21 +41,6 @@ commands.set('ping', {
     },
 });
 
-commands.set('tts', {
-    cmd: ['tts'],
-    description: 'Badilisha maandishi kuwa sauti',
-    handler: async (msg, { sock, args }) => {
-        if (args.length === 0) {
-            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali andika maandishi ya kubadilisha kuwa sauti.' });
-            return;
-        }
-        const text = args.join(' ');
-        const audioUrl = await convertTextToSpeech(text);
-        const audioBuffer = await axios.get(audioUrl, { responseType: 'arraybuffer' });
-        await sock.sendMessage(msg.key.remoteJid, { audio: Buffer.from(audioBuffer.data), mimetype: 'audio/mpeg' });
-    },
-});
-
 commands.set('ai', {
     cmd: ['ai'],
     description: 'Tuma swali kwa AI na upate jibu',
@@ -93,6 +78,9 @@ commands.set('ai', {
     },
 });
 
+// Ondoa amri ya 'tts'
+commands.delete('tts');
+
 // QR Code Page
 app.get('/qr', async (req, res) => {
     if (!latestQR) return res.send('⏳ QR bado haijapatikana. Subiri kidogo...');
@@ -109,14 +97,13 @@ app.listen(PORT, () => {
     console.log(`✅ Express Server running at http://localhost:${PORT}`);
 });
 
-// Convert text to speech
-async function convertTextToSpeech(text) {
-    return googleTTS.getAudioUrl(text, {
-        lang: 'sw',
-        slow: false,
-        host: 'https://translate.google.com',
-    });
-}
+// async function convertTextToSpeech(text) {
+//     return googleTTS.getAudioUrl(text, {
+//         lang: 'sw',
+//         slow: false,
+//         host: 'https://translate.google.com',
+//     });
+// }
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
