@@ -1,0 +1,16 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Authentication state
+auth_info/
+
+# Logs
+logs/
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
