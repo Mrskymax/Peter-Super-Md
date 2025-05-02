@@ -180,6 +180,17 @@ commands.set('removebground', {
     },
 });
 
+commands.set('repo', {
+    cmd: ['repo', 'source'],
+    description: 'Pata kiungo cha repo kwa ajili ya kudeploy bot',
+    handler: async (msg, { sock }) => {
+        const repoLink = 'https://github.com/Peterjoram37/Peter-Super-Md';
+        await sock.sendMessage(msg.key.remoteJid, {
+            text: `✅ Hii hapa repo ya bot: ${repoLink}\n\nUnaweza kuifork na kuanza kudeploy!`
+        });
+    },
+});
+
 // Ondoa amri ya 'tts'
 commands.delete('tts');
 
