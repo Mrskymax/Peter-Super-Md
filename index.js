@@ -68,6 +68,24 @@ commands.set('ai', {
     },
 });
 
+commands.set('menu', {
+    cmd: ['menu'],
+    description: 'Onyesha orodha ya amri zote zinazopatikana',
+    handler: async (msg, { sock }) => {
+        let menuText = '📜 *Orodha ya Amri*:\n\n';
+        commands.forEach((value, key) => {
+            menuText += `*${key}* - ${value.description}\n`;
+        });
+
+        const menuImage = {
+            image: { url: "https://i.postimg.cc/KzpRf3pt/Chat-GPT-Image-Apr-23-2025-08-07-24-PM.png" },
+            caption: menuText
+        };
+
+        await sock.sendMessage(msg.key.remoteJid, menuImage);
+    },
+});
+
 // Ondoa amri ya 'tts'
 commands.delete('tts');
 
