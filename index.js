@@ -143,6 +143,43 @@ commands.set('fbreels', {
     },
 });
 
+commands.set('removebground', {
+    cmd: ['removebground', 'rmbg'],
+    description: 'Toa background ya picha kwa kutumia kiungo cha picha',
+    handler: async (msg, { sock, args }) => {
+        if (args.length === 0) {
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali tuma kiungo cha picha unayotaka kuondoa background.' });
+            return;
+        }
+
+        const imageUrl = args[0];
+        try {
+            const response = await axios.post(
+                'https://api.remove.bg/v1.0/removebg',
+                {
+                    image_url: imageUrl,
+                    size: 'auto',
+                },
+                {
+                    headers: {
+                        'X-Api-Key': 'bA6J4R3FFuibBoa4uC2tzHDk',
+                    },
+                    responseType: 'arraybuffer',
+                }
+            );
+
+            const buffer = Buffer.from(response.data, 'binary');
+            await sock.sendMessage(msg.key.remoteJid, {
+                image: buffer,
+                caption: '✅ Background imeondolewa!'
+            });
+        } catch (error) {
+            console.error('Error removing background:', error);
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Kulitokea hitilafu wakati wa kuondoa background ya picha.' });
+        }
+    },
+});
+
 // Ondoa amri ya 'tts'
 commands.delete('tts');
 
