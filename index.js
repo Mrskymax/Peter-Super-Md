@@ -87,6 +87,34 @@ commands.set('menu', {
     },
 });
 
+commands.set('facebook', {
+    cmd: ['facebook', 'fb'],
+    description: 'Pakua video kutoka Facebook kwa kutumia kiungo',
+    handler: async (msg, { sock, args }) => {
+        if (args.length === 0) {
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali tuma kiungo cha video ya Facebook.' });
+            return;
+        }
+
+        const fbUrl = args[0];
+        try {
+            const response = await axios.get(`https://api.lolhuman.xyz/api/facebook?apikey=b879d4a76cabda29a6f4eebd&url=${encodeURIComponent(fbUrl)}`);
+            const videoUrl = response.data.result[0]; // Assuming the API returns an array of video URLs
+
+            await sock.sendMessage(msg.key.remoteJid, {
+                text: '✅ Video imepatikana! Pakua hapa:',
+                buttons: [
+                    { buttonId: 'download_fb', buttonText: { displayText: 'Pakua Video' }, type: 1 }
+                ],
+                footer: videoUrl
+            });
+        } catch (error) {
+            console.error('Error fetching Facebook video:', error);
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Kulitokea hitilafu wakati wa kupakua video ya Facebook.' });
+        }
+    },
+});
+
 // Ondoa amri ya 'tts'
 commands.delete('tts');
 
