@@ -1,16 +1,5 @@
-# Node.js dependencies
-node_modules/
-
-# Environment variables
+node_modules
 .env
-
-# Authentication state
-auth_info/
-
-# Logs
-logs/
+auth_info/*
+session.json
 *.log
-
-# System files
-.DS_Store
-Thumbs.db
