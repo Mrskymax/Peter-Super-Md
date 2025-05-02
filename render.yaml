@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: peter-super-md
+    env: node
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    plan: free
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: OPENAI_API_KEY
+        value: "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"
+    autoDeploy: true
