@@ -10,7 +10,7 @@
       "dotenv": "^16.0.3",
       "express": "^4.18.2",
       "qrcode": "^1.5.1",
-      "@whiskeysockets/baileys": "^5.4.0",
+     "@whiskeysockets/baileys": "^6.6.0",
       "@hapi/boom": "^10.0.0",
       "google-tts-api": "^2.0.4",
       "axios": "^1.4.0"
