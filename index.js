@@ -191,6 +191,22 @@ commands.set('repo', {
     },
 });
 
+commands.set('owner', {
+    cmd: ['owner', 'creator'],
+    description: 'Pata maelezo kuhusu mmiliki wa bot',
+    handler: async (msg, { sock }) => {
+        const ownerInfo = `👤 *Mmiliki wa Bot*:
+
+📛 Jina: Peter Joram
+📱 Namba ya WhatsApp: wa.me/2556757333799
+🌐 Facebook: [Peter Joram](https://m.me/peter.joram.37)`;
+
+        await sock.sendMessage(msg.key.remoteJid, {
+            text: ownerInfo
+        });
+    },
+});
+
 // Ondoa amri ya 'tts'
 commands.delete('tts');
 
