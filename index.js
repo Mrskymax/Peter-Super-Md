@@ -199,7 +199,7 @@ commands.set('owner', {
 
 📛 Jina: Peter Joram
 📱 Namba ya WhatsApp: wa.me/2556757333799
-🌐 Facebook: [Peter Joram](https://m.me/peter.joram.37)`;
+🌐 Facebook: https://m.me/peter.joram.37`;
 
         await sock.sendMessage(msg.key.remoteJid, {
             text: ownerInfo
