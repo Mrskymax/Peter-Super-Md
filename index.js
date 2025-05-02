@@ -14,16 +14,6 @@ const PORT = process.env.PORT || 3000;
 let latestQR = '';
 const commands = new Map();
 
-// Soma mafaili yote ya commands
-const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    const commandName = command.cmd?.[0] || command.name; // Chukua jina la kwanza la cmd au name
-    if (commandName) {
-        commands.set(commandName, command);
-    }
-}
-
 // Ongeza amri moja kwa moja hapa
 commands.set('hello', {
     cmd: ['hello'],
