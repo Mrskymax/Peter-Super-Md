@@ -621,5 +621,6 @@ async function startBot() {
     
         // Ongeza utendaji wa ujumbe hapa ikiwa inahitajika
     }); // Kufunga sock.ev.on
-    
-    startBot(); // Hakikisha hii inafungwa ipasavyo
+} // Close startBot function
+
+startBot();
