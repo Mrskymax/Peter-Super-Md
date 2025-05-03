@@ -15,16 +15,9 @@ const PORT = process.env.PORT || 8080;
 
 let latestQR = '';
 
-// Define the prefix
-const PREFIX = '!'; // You can change this to any prefix you want
+ // Prefix for all commands
 
-// Modify cmd function to include prefix
-function cmd({ pattern, ...options }, handler) {
-    const commandPattern = `${PREFIX}${pattern}`;
-    commands.set(commandPattern, { ...options, handler });
-}
-
-// Example usage of cmd with the new prefix
+// Ongeza amri moja kwa moja hapa
 cmd({
     pattern: "groupmenu",
     desc: "menu the bot",
@@ -125,7 +118,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         await conn.sendMessage(
             from,
             {
-                image: { url: `https://i.imgur.com/PEZ5QL2.jpeg` },
+                image: { url: `https://i.postimg.cc/KzpRf3pt/Chat-GPT-Image-Apr-23-2025-08-07-24-PM.png` },
                 caption: dec,
                 contextInfo: {
                     mentionedJid: [m.sender],
@@ -198,23 +191,6 @@ commands.set('ai', {
     },
 });
 
-commands.set('menu', {
-    cmd: ['menu'],
-    description: 'Onyesha orodha ya amri zote zinazopatikana',
-    handler: async (msg, { sock }) => {
-        let menuText = '📜 *Orodha ya Amri*:\n\n';
-        commands.forEach((value, key) => {
-            menuText += `*${key}* - ${value.description}\n`;
-        });
-
-        const menuImage = {
-            image: { url: "https://i.postimg.cc/KzpRf3pt/Chat-GPT-Image-Apr-23-2025-08-07-24-PM.png" },
-            caption: menuText
-        };
-
-        await sock.sendMessage(msg.key.remoteJid, menuImage);
-    },
-});
 
 commands.set('facebook', {
     cmd: ['facebook', 'fb'],
