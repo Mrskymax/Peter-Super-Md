@@ -620,6 +620,6 @@ async function startBot() {
         if (!text) return;
 
        
-}
+});
 
 startBot();
