@@ -614,15 +614,26 @@ async function startBot() {
     sock.ev.on('messages.upsert', async ({ messages }) => {
         const msg = messages[0];
         if (!msg.message || msg.key.fromMe) return;
-    
+
         const text = msg.message.conversation || msg.message.extendedTextMessage?.text;
         const sender = msg.key.remoteJid;
-        const senderName = msg.pushName || 'User';
-    
-        if (!text) return;
-    
-        // Ongeza utendaji wa ujumbe hapa ikiwa inahitajika
-    }); // Kufunga sock.ev.on
+
+        if (!text.startsWith(PREFIX)) return; // Hakikisha ujumbe una prefix
+        const [command, ...args] = text.slice(PREFIX.length).trim().split(/\s+/); // Pata amri na hoja
+
+        const cmd = commands.get(`${PREFIX}${command}`) || [...commands.values()].find(c => c.alias?.includes(`${PREFIX}${command}`));
+        if (!cmd) {
+            await sock.sendMessage(sender, { text: '❌ Amri haijulikani. Tumia `.menu` kuona orodha ya amri.' });
+            return;
+        }
+
+        try {
+            await cmd.handler(msg, { sock, args });
+        } catch (error) {
+            console.error('Error executing command:', error);
+            await sock.sendMessage(sender, { text: '❌ Kulitokea hitilafu wakati wa kutekeleza amri.' });
+        }
+    });
 } // Close startBot function
 
 startBot();
