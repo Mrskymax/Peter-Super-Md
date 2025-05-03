@@ -589,25 +589,17 @@ async function startBot() {
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect, qr } = update;
-        if (qr) latestQR = qr;
+        const { connection, qr } = update;
 
-        if (connection === 'close') {
-            const shouldReconnect = lastDisconnect?.error instanceof Boom && lastDisconnect.error.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log('❌ Connection closed:', lastDisconnect?.error);
-            if (shouldReconnect) {
-                console.log('🔄 Reconnecting...');
-                startBot();
-            } else {
-                console.log('🚫 Logged out, delete auth_info and restart.');
-            }
-        } else if (connection === 'open') {
-            console.log('✅ Bot Connected to WhatsApp!');
-            latestQR = '';
+        if (qr) {
+            console.log('🔄 QR Code imebadilika. Scan QR Code mpya hapa:');
+            qrcodeTerminal.generate(qr, { small: true }); // Onyesha QR code kwenye terminal
+        }
 
-            // Notify owner
-            const ownerNumber = '255677780801@s.whatsapp.net';
-            sock.sendMessage(ownerNumber, { text: '🤖 Bot imeunganishwa kikamilifu na WhatsApp! 🎉' });
+        if (connection === 'open') {
+            console.log('✅ Bot imeunganishwa na WhatsApp!');
+        } else if (connection === 'close') {
+            console.log('❌ Muunganisho umefungwa. Jaribu tena.');
         }
     });
 
