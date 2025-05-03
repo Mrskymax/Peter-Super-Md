@@ -1,6 +1,7 @@
 require('dotenv').config('./peter/.env');
 const express = require('express');
 const qrcode = require('qrcode');
+const qrcodeTerminal = require('qrcode-terminal');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
 const fs = require('fs');
