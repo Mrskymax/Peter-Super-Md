@@ -14,8 +14,37 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 let latestQR = '';
+// Define the prefix
+const PREFIX = '!'; // Badilisha '!' kuwa prefix unayotaka
 
- // Prefix for all commands
+// Modify cmd function to include prefix
+function cmd({ pattern, alias = [], ...options }) {
+    const prefixedPattern = `${PREFIX}${pattern}`;
+    const prefixedAlias = alias.map(a => `${PREFIX}${a}`);
+    commands.set(prefixedPattern, { ...options, alias: prefixedAlias });
+}
+
+// Example usage of cmd with the new prefix
+cmd({
+    pattern: "ping",
+    alias: ["pong"],
+    react: "🌏",
+    description: 'Jibu na "Pong!"',
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: 'Pong! 🏓' });
+    },
+});
+
+cmd({
+    pattern: "grouplink",
+    react: "🔗",
+    description: "Pata kiungo cha kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Hii hapa kiungo cha kundi: [Kiungo Placeholder]" });
+    },
+});
+
+// Ongeza amri nyingine kwa mtindo huu...
 
 // Ongeza amri moja kwa moja hapa
 cmd({
@@ -140,9 +169,104 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
     }
 });
 
+cmd({
+    pattern: "grouplink",
+    react: "🔗",
+    description: "Pata kiungo cha kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Hii hapa kiungo cha kundi: [Kiungo Placeholder]" });
+    },
+});
 
+cmd({
+    pattern: "kickall",
+    react: "👋",
+    description: "Ondoa washiriki wote wa kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Washiriki wote wameondolewa!" });
+    },
+});
 
+cmd({
+    pattern: "add",
+    react: "➕",
+    description: "Ongeza mshiriki kwenye kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Mshiriki ameongezwa kwenye kundi!" });
+    },
+});
 
+cmd({
+    pattern: "remove",
+    react: "❌",
+    description: "Ondoa mshiriki kutoka kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Mshiriki ameondolewa kutoka kundi!" });
+    },
+});
+
+cmd({
+    pattern: "promote",
+    react: "⬆️",
+    description: "Mpa mshiriki admin",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Mshiriki amepewa admin!" });
+    },
+});
+
+cmd({
+    pattern: "demote",
+    react: "⬇️",
+    description: "Ondoa admin kwa mshiriki",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Admin ameondolewa kwa mshiriki!" });
+    },
+});
+
+cmd({
+    pattern: "setwelcome",
+    react: "👋",
+    description: "Weka ujumbe wa kukaribisha",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Ujumbe wa kukaribisha umewekwa!" });
+    },
+});
+
+cmd({
+    pattern: "setgoodbye",
+    react: "👋",
+    description: "Weka ujumbe wa kuaga",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Ujumbe wa kuaga umewekwa!" });
+    },
+});
+
+cmd({
+    pattern: "mute",
+    react: "🔇",
+    description: "Zima kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Kundi limezimwa!" });
+    },
+});
+
+cmd({
+    pattern: "unmute",
+    react: "🔊",
+    description: "Washa kundi",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Kundi limewashwa!" });
+    },
+});
+
+cmd({
+    pattern: "tagall",
+    react: "📢",
+    description: "Taja washiriki wote",
+    handler: async (msg, { sock }) => {
+        await sock.sendMessage(msg.key.remoteJid, { text: "Washiriki wote wametajwa!" });
+    },
+});
 
 cmd({
     pattern: "ping", 
@@ -151,6 +275,104 @@ cmd({
     description: 'Jibu na "Pong!"',
     handler: async (msg, { sock }) => {
         await sock.sendMessage(msg.key.remoteJid, { text: 'Pong! 🏓' });
+    },
+});
+
+cmd({
+    pattern: "ai",
+    alias: ["ai"],
+    react: "🤖",
+    description: "Tuma swali kwa AI na upate jibu",
+    handler: async (msg, { sock, args }) => {
+        if (args.length === 0) {
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali andika swali au maelezo kwa AI.' });
+            return;
+        }
+
+        const prompt = args.join(' ');
+
+        try {
+            const response = await axios.post(
+                'https://api.openai.com/v1/completions',
+                {
+                    model: 'text-davinci-003',
+                    prompt: prompt,
+                    max_tokens: 150,
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                    },
+                }
+            );
+
+            const aiResponse = response.data.choices[0].text.trim();
+            await sock.sendMessage(msg.key.remoteJid, { text: `🤖 AI: ${aiResponse}` });
+        } catch (error) {
+            console.error('Error with OpenAI API:', error);
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Kulitokea hitilafu wakati wa kuwasiliana na AI.' });
+        }
+    },
+});
+
+cmd({
+    pattern: "facebook",
+    alias: ["fb"],
+    react: "📹",
+    description: "Pakua video kutoka Facebook kwa kutumia kiungo",
+    handler: async (msg, { sock, args }) => {
+        if (args.length === 0) {
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali tuma kiungo cha video ya Facebook.' });
+            return;
+        }
+
+        const fbUrl = args[0];
+        try {
+            const response = await axios.get(`https://api.lolhuman.xyz/api/facebook?apikey=b879d4a76cabda29a6f4eebd&url=${encodeURIComponent(fbUrl)}`);
+            const videoUrl = response.data.result[0];
+
+            await sock.sendMessage(msg.key.remoteJid, {
+                text: '✅ Video imepatikana! Pakua hapa:',
+                buttons: [
+                    { buttonId: 'download_fb', buttonText: { displayText: 'Pakua Video' }, type: 1 }
+                ],
+                footer: videoUrl
+            });
+        } catch (error) {
+            console.error('Error fetching Facebook video:', error);
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Kulitokea hitilafu wakati wa kupakua video ya Facebook.' });
+        }
+    },
+});
+
+cmd({
+    pattern: "fbreels",
+    alias: ["reels"],
+    react: "🎥",
+    description: "Pakua reels kutoka Facebook kwa kutumia kiungo",
+    handler: async (msg, { sock, args }) => {
+        if (args.length === 0) {
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali tuma kiungo cha reels ya Facebook.' });
+            return;
+        }
+
+        const fbReelsUrl = args[0];
+        try {
+            const response = await axios.get(`https://api.lolhuman.xyz/api/facebook?apikey=b879d4a76cabda29a6f4eebd&url=${encodeURIComponent(fbReelsUrl)}`);
+            const reelsUrl = response.data.result[0];
+
+            await sock.sendMessage(msg.key.remoteJid, {
+                text: '✅ Reels imepatikana! Pakua hapa:',
+                buttons: [
+                    { buttonId: 'download_reels', buttonText: { displayText: 'Pakua Reels' }, type: 1 }
+                ],
+                footer: reelsUrl
+            });
+        } catch (error) {
+            console.error('Error fetching Facebook reels:', error);
+            await sock.sendMessage(msg.key.remoteJid, { text: '❌ Kulitokea hitilafu wakati wa kupakua reels ya Facebook.' });
+        }
     },
 });
 
@@ -248,9 +470,11 @@ commands.set('fbreels', {
     },
 });
 
-commands.set('removebground', {
-    cmd: ['removebground', 'rmbg'],
-    description: 'Toa background ya picha kwa kutumia kiungo cha picha',
+cmd({
+    pattern: "removebground",
+    alias: ["rmbg"],
+    react: "🖼️",
+    description: "Toa background ya picha kwa kutumia kiungo cha picha",
     handler: async (msg, { sock, args }) => {
         if (args.length === 0) {
             await sock.sendMessage(msg.key.remoteJid, { text: '❌ Tafadhali tuma kiungo cha picha unayotaka kuondoa background.' });
@@ -285,9 +509,11 @@ commands.set('removebground', {
     },
 });
 
-commands.set('repo', {
-    cmd: ['repo', 'source'],
-    description: 'Pata kiungo cha repo kwa ajili ya kudeploy bot',
+cmd({
+    pattern: "repo",
+    alias: ["source"],
+    react: "📂",
+    description: "Pata kiungo cha repo kwa ajili ya kudeploy bot",
     handler: async (msg, { sock }) => {
         const repoLink = 'https://github.com/Peterjoram37/Peter-Super-Md';
         await sock.sendMessage(msg.key.remoteJid, {
@@ -296,9 +522,11 @@ commands.set('repo', {
     },
 });
 
-commands.set('owner', {
-    cmd: ['owner', 'creator'],
-    description: 'Pata maelezo kuhusu mmiliki wa bot',
+cmd({
+    pattern: "owner",
+    alias: ["creator"],
+    react: "👤",
+    description: "Pata maelezo kuhusu mmiliki wa bot",
     handler: async (msg, { sock }) => {
         const ownerInfo = `👤 *Mmiliki wa Bot*:
 
