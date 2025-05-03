@@ -15,9 +15,16 @@ const PORT = process.env.PORT || 8080;
 
 let latestQR = '';
 
- // Prefix for all commands
+// Define the prefix
+const PREFIX = '!'; // You can change this to any prefix you want
 
-// Ongeza amri moja kwa moja hapa
+// Modify cmd function to include prefix
+function cmd({ pattern, ...options }, handler) {
+    const commandPattern = `${PREFIX}${pattern}`;
+    commands.set(commandPattern, { ...options, handler });
+}
+
+// Example usage of cmd with the new prefix
 cmd({
     pattern: "groupmenu",
     desc: "menu the bot",
