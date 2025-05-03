@@ -15,10 +15,11 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 let latestQR = '';
-const commands = new Map();
+
 // Define the prefix
 const PREFIX = '!'; // Badilisha '!' kuwa prefix unayotaka
-
+// Fafanua ramani ya kuhifadhi amri
+const commands = new Map();
 // Modify cmd function to include prefix
 function cmd({ pattern, alias = [], ...options }) {
     const prefixedPattern = `${PREFIX}${pattern}`;
