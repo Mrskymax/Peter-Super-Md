@@ -15,6 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 let latestQR = '';
+const commands = new Map();
 // Define the prefix
 const PREFIX = '!'; // Badilisha '!' kuwa prefix unayotaka
 
