@@ -589,43 +589,40 @@ async function startBot() {
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', (update) => {
-        const { connection, qr } = update;
+        const { connection, lastDisconnect, qr } = update;
+        if (qr) latestQR = qr;
 
-        if (qr) {
-            console.log('🔄 QR Code imebadilika. Scan QR Code mpya hapa:');
-            qrcodeTerminal.generate(qr, { small: true }); // Onyesha QR code kwenye terminal
-        }
+        if (connection === 'close') {
+            const shouldReconnect = lastDisconnect?.error instanceof Boom && lastDisconnect.error.output?.statusCode !== DisconnectReason.loggedOut;
+            console.log('❌ Connection closed:', lastDisconnect?.error);
+            if (shouldReconnect) {
+                console.log('🔄 Reconnecting...');
+                startBot();
+            } else {
+                console.log('🚫 Logged out, delete auth_info and restart.');
+            }
+        } else if (connection === 'open') {
+            console.log('✅ Bot Connected to WhatsApp!');
+            latestQR = '';
 
-        if (connection === 'open') {
-            console.log('✅ Bot imeunganishwa na WhatsApp!');
-        } else if (connection === 'close') {
-            console.log('❌ Muunganisho umefungwa. Jaribu tena.');
+            // Notify owner
+            const ownerNumber = '255677780801@s.whatsapp.net';
+            sock.sendMessage(ownerNumber, { text: '🤖 Bot imeunganishwa kikamilifu na WhatsApp! 🎉' });
         }
     });
 
     sock.ev.on('messages.upsert', async ({ messages }) => {
         const msg = messages[0];
         if (!msg.message || msg.key.fromMe) return;
-
+    
         const text = msg.message.conversation || msg.message.extendedTextMessage?.text;
         const sender = msg.key.remoteJid;
-
-        if (!text.startsWith(PREFIX)) return; // Hakikisha ujumbe una prefix
-        const [command, ...args] = text.slice(PREFIX.length).trim().split(/\s+/); // Pata amri na hoja
-
-        const cmd = commands.get(`${PREFIX}${command}`) || [...commands.values()].find(c => c.alias?.includes(`${PREFIX}${command}`));
-        if (!cmd) {
-            await sock.sendMessage(sender, { text: '❌ Amri haijulikani. Tumia `.menu` kuona orodha ya amri.' });
-            return;
-        }
-
-        try {
-            await cmd.handler(msg, { sock, args });
-        } catch (error) {
-            console.error('Error executing command:', error);
-            await sock.sendMessage(sender, { text: '❌ Kulitokea hitilafu wakati wa kutekeleza amri.' });
-        }
-    });
+        const senderName = msg.pushName || 'User';
+    
+        if (!text) return;
+    
+        // Ongeza utendaji wa ujumbe hapa ikiwa inahitajika
+    }); // Kufunga sock.ev.on
 } // Close startBot function
 
 startBot();
