@@ -1,31 +1,153 @@
-require('dotenv').config();
+require('dotenv').config('./peter/.env');
 const express = require('express');
 const qrcode = require('qrcode');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
 const fs = require('fs');
+const os = require("os");
 const path = require('path');
 const axios = require('axios');
 
 
+const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 8080;
 
 let latestQR = '';
-const commands = new Map();
-const COMMAND_PREFIX = '.'; // Prefix for all commands
+
+ // Prefix for all commands
 
 // Ongeza amri moja kwa moja hapa
-commands.set('hello', {
-    cmd: ['hello'],
-    description: 'Jibu salamu',
-    handler: async (msg, { sock }) => {
-        await sock.sendMessage(msg.key.remoteJid, { text: 'Hello! 👋' });
-    },
+cmd({
+    pattern: "groupmenu",
+    desc: "menu the bot",
+    category: "menu",
+    react: "🥰",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try
+       {
+        let dec = `╭━━〔 *Group Menu* 〕━━┈⊷
+┃◈╭─────────────·๏
+┃◈┃• grouplink
+┃◈┃• kickall
+┃◈┃• add
+┃◈┃• remove
+┃◈┃• kick
+┃◈┃• promote 
+┃◈┃• demote
+┃◈┃• dismiss 
+┃◈┃• revoke
+┃◈┃• setgoodbye
+┃◈┃• setwelcome
+┃◈┃• delete 
+┃◈┃• getpic
+┃◈┃• ginfo
+┃◈┃• delete 
+┃◈┃• disappear on
+┃◈┃• disappear off
+┃◈┃• disappear 7D,24H
+┃◈┃• allreq
+┃◈┃• updategname
+┃◈┃• updategdesc
+┃◈┃• joinrequests
+┃◈┃• senddm
+┃◈┃• nikal
+┃◈┃• mute
+┃◈┃• unmute
+┃◈┃• lockgc
+┃◈┃• unlockgc
+┃◈┃• invite
+┃◈┃• tag
+┃◈┃• hidetag
+┃◈┃• tagall
+┃◈┃• tagadmins
+┃◈└───────────┈⊷
+╰──────────────┈⊷
+> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://i.imgur.com/PEZ5QL2.jpeg` },
+                caption: dec,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363200367779016@newsletter',
+                        newsletterName: 'PETER SUPER MD',
+                        serverMessageId: 143
+                    }
+                }
+            },
+            { quoted: mek }
+        );
+
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
 });
 
-commands.set('ping', {
-    cmd: ['ping'],
+// fun menu
+
+cmd({
+    pattern: "funmenu",
+    desc: "menu the bot",
+    category: "menu",
+    react: "😎",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+
+        let dec = `╭━━〔 *Fun😎 Menu * 〕━━┈⊷
+┃◈╭─────────────·๏
+┃◈┃• ??? 
+┃◈┃• ???
+┃◈┃• ???
+┃◈┃• ????
+┃◈┃• ???
+┃◈└───────────┈⊷
+╰──────────────┈⊷
+> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://i.imgur.com/PEZ5QL2.jpeg` },
+                caption: dec,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363200367779016@newsletter',
+                        newsletterName: 'PETER SUPER MD',
+                        serverMessageId: 143
+                    }
+                }
+            },
+            { quoted: mek }
+        );
+
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});
+
+
+
+
+
+cmd({
+    pattern: "ping", 
+    alias: ["ping"],
+    react: "🌏",
     description: 'Jibu na "Pong!"',
     handler: async (msg, { sock }) => {
         await sock.sendMessage(msg.key.remoteJid, { text: 'Pong! 🏓' });
@@ -234,6 +356,14 @@ app.listen(PORT, () => {
 //     });
 // }
 
+const AUTH_INFO_PATH = './auth_info';
+
+// Ensure auth_info directory exists
+if (!fs.existsSync(AUTH_INFO_PATH)) {
+    fs.mkdirSync(AUTH_INFO_PATH, { recursive: true });
+    console.log('📂 auth_info directory created.');
+}
+
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
 
@@ -277,30 +407,7 @@ async function startBot() {
 
         if (!text) return;
 
-        // Commands
-        if (text.startsWith(COMMAND_PREFIX)) {
-            const args = text.trim().split(/ +/);
-            const commandName = args.shift().slice(COMMAND_PREFIX.length).toLowerCase();
-
-            const command = commands.get(commandName);
-            if (command) {
-                try {
-                    if (command.handler) {
-                        await command.handler(msg, { sock, args, senderName });
-                    } else if (command.execute) {
-                        await command.execute(sock, msg, args, senderName);
-                    } else {
-                        console.error(`Command ${commandName} haina handler au execute method.`);
-                    }
-                } catch (err) {
-                    console.error(err);
-                    await sock.sendMessage(sender, { text: '❌ Kulitokea kosa wakati wa kutekeleza amri.' });
-                }
-            } else {
-                await sock.sendMessage(sender, { text: `❌ Amri haijulikani: ${commandName}` });
-            }
-        }
-    });
+       
 }
 
 startBot();
