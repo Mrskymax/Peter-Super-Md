@@ -612,14 +612,14 @@ async function startBot() {
     sock.ev.on('messages.upsert', async ({ messages }) => {
         const msg = messages[0];
         if (!msg.message || msg.key.fromMe) return;
-
+    
         const text = msg.message.conversation || msg.message.extendedTextMessage?.text;
         const sender = msg.key.remoteJid;
         const senderName = msg.pushName || 'User';
-
+    
         if (!text) return;
-
-       
-});
-
-startBot();
+    
+        // Ongeza utendaji wa ujumbe hapa ikiwa inahitajika
+    }); // Kufunga sock.ev.on
+    
+    startBot(); // Hakikisha hii inafungwa ipasavyo
